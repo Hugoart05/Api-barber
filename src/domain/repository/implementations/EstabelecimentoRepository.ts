@@ -1,4 +1,4 @@
-import { Estabelecimento, Usuario } from "../../../infraestruture/database/db";
+import { Estabelecimento, Plano, Usuario } from "../../../infraestruture/database/db";
 import { IEstabelecimentoRepository } from "../IEstabelecimentoRepository";
 import { RepositoryBase } from "./RepositoryBase";
 
@@ -8,8 +8,9 @@ export class EstabelecimentoRepository extends RepositoryBase<Estabelecimento> i
     }
 
     async countUserEstabelecimentos(usuarioid: number): Promise<number> {
-        const model = await this.getModel()
-        return await model.count({where: {usuarioid}})
+        const model = this.getModel()
+        const estabelecimentos = await Estabelecimento.count({where:{usuarioid}})
+        return estabelecimentos
     }
 
 }

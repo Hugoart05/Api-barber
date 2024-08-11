@@ -11,7 +11,9 @@ export default class EstabelecimentoComercial{
     //Todos os metodos levam em consideracao que o plano premium nao tem limites para adicionar items ao seu inventario
 
     podeAdicionarEstabelecimento(quantidadeEstabelecimento:number):boolean{
-        return quantidadeEstabelecimento < this.plano.numeroMaximoEstabelecimento || this.plano.nome === "premium"
+        if(quantidadeEstabelecimento < this.plano.numeroMaximoEstabelecimento)
+            return true
+        return false
     }
 
     podeMudarNome(countMudanca:number):boolean{

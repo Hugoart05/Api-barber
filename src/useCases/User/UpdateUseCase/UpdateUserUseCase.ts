@@ -3,6 +3,10 @@ import { IUsuarioRepository } from "../../../domain/repository/IUsuarioRepositor
 import { IUsuario } from "../../../infraestruture/database/models/IUsuario";
 import { IPermissaoPorIntervaloTempo } from "../../../types/IPermissaoPorIntervaloTempo";
 import {  formatTimeForMessage } from "../../../helpers/validators";
+import { NotFoundError } from "../../../helpers/custom-errors/NotFoundError";
+import { CustomResult } from "../../../types/ICustomResult";
+import { CustomError } from "../../../helpers/custom-errors/custom-error";
+import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
 
 export class UpdateUserUseCase {
 
@@ -12,21 +16,25 @@ export class UpdateUserUseCase {
     ) {
     }
 
-    async execute(data: Optional<IUsuario, 'id'>, id: number) {
+    async execute(data: Optional<IUsuario, 'id'>, id: number):Promise<CustomResult> {
         try {
             const user = await this.repository.getById(id)
-            if(!user)
-                throw new Error("usuario iniexistente")
 
+            if(!user)
+                throw new NotFoundError("usuario iniexistente")
+            
             const { isValid, rest } = this.permissaoTempo.validatePermissao(5, user.dataValues.updatedAt)
             if (!isValid){
                 const message = formatTimeForMessage(rest)
-                throw new Error(`Aguarde ${message} para  atualizar novamente`)
+                return {message:`Aguarde ${message} para  atualizar novamente`, success:false}
             }
             await this.repository.update(id, data)
+            return {message:`Usuário atualizado com sucesso!`, success:true}
         } catch (error) {
-            console.log(error)
-            throw new Error(`${error}`)
+            if(error instanceof CustomError){
+                throw error
+            }
+            throw new DataBaseError(`Erro ao acessar os dados no banco!`)
         }
     }
 }

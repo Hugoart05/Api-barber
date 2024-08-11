@@ -15,10 +15,12 @@ export default class UpdateUserController {
             const user = request.body
             if (!user.id)
                 throw new Error("Usuário não existe ou é inválido")
-            await this.usuarioUseCase.execute(user, user.id)
-            return sendResponse(response, 200, ["Usuario atualizado com sucesso!"],)
+            const {message, success} = await this.usuarioUseCase.execute(user, user.id)
+            if(success)
+                return sendResponse(response, 200, [message],)
+            return sendResponse(response,400, [message])
         } catch (error) {
-            return sendResponse(response, 400, [error.message])
+            next(error)
         }
     }
 }

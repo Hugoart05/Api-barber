@@ -17,22 +17,24 @@ export default class CreateEstabelecimentoUseCase {
         try {
             const constulaPlanoDoUsuario = await this.userRepository.getPlanType(usuarioid)
             if (!constulaPlanoDoUsuario)
-                throw new NotFoundError("Não a planos registrado para o usuario selecionado!")
-
+                throw new NotFoundError("Não a plano registrado para o usuario selecionado!")
+            
+            const quantidadeDeEstabelecimentos = await this.estabelecimentoRepository.countUserEstabelecimentos(usuarioid)
             const regrasDeAdicaoEstabelecimento = new EstabelecimentoComercial(constulaPlanoDoUsuario)
-            const consultaSePodeRegistrar = regrasDeAdicaoEstabelecimento.
-                podeAdicionarEstabelecimento(await this.estabelecimentoRepository.countUserEstabelecimentos(usuarioid))
-
+            const consultaSePodeRegistrar = regrasDeAdicaoEstabelecimento.podeAdicionarEstabelecimento(quantidadeDeEstabelecimentos)
+            
             if (consultaSePodeRegistrar) {
+                estabelecimentoData.usuarioid = usuarioid
+                console.log(estabelecimentoData)
                 await this.estabelecimentoRepository.create(estabelecimentoData)
-                return { message: "Usuario criado com sucesso", success: true }
+                return { message: "Estabelecimento criado com sucesso", success: true }
             }
-            return { message: "Não é possivel registrar mais 1 estabelecimento com o plano atual", success: true }
+            return { message: "Não é possivel registrar mais 1 estabelecimento com o plano atual ", success: false }
         }catch(error){
             if(error instanceof NotFoundError)
                 throw error
             
-            throw new DataBaseError("Erro interno ao processar a requisição")
+            throw new DataBaseError("Erro interno ao processar a requisição" + error.message)
         }
     }
 }

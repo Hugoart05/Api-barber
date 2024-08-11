@@ -1,6 +1,7 @@
 import {  Model, ModelStatic, UpdateOptions, WhereOptions } from "sequelize";
 import { IRepositoryBase } from '../IRepositoryBase'
 import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
+import { CustomError } from "../../../helpers/custom-errors/custom-error";
 
 export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
     constructor(private model: ModelStatic<T>) { }
@@ -22,7 +23,7 @@ export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
                 where: { id }
             } as UpdateOptions)
 
-            if(affectedCount)
+            if(affectedCount  === 0)
                 throw new DataBaseError("Falha ao atualizar o registro")
         } catch (error) {
             throw new DataBaseError("Nenhum registro foi atualizado, verifique se o id esta correto")
@@ -46,7 +47,10 @@ export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
         try{
             return await this.model.create(data)
         }catch(error){
-            throw new DataBaseError(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
+            if(error instanceof CustomError){
+                throw new DataBaseError(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
+            }
+            throw error
         }
     }
 

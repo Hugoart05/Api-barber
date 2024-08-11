@@ -3,14 +3,23 @@ import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
 import { Estabelecimento, Plano } from "../../../infraestruture/database/db";
 import { IUsuario } from '../../../infraestruture/database/models/IUsuario'
 export class GetUsersUseCase {
-    constructor(private usuarioRepository: IUsuarioRepository) { }
+  constructor(private usuarioRepository: IUsuarioRepository) { }
 
-    async execute() {
-      try{
-        const users =  await this.usuarioRepository.getModel().findByPk(2,{include:[{model:Plano, as:'plan'},{model:Estabelecimento, as: 'estabelecimentos'}], })
-        return users?.dataValues
-      }catch(error){
-        throw new DataBaseError("Erro ao carregar as entidades associadas ao usuario.")
-      }
+  async execute() {
+    try {
+      const users = await this.usuarioRepository.getViewModelData(1)
+      const plan = users?.plan?.dataValues
+      // if (users && plan ) {
+      //   const viewModel = {
+      //     nome: users.nome,
+      //     email: users.email,
+      //     plan: users.plan?.dataValues.nome
+      //   }
+      //   return viewModel
+      // }
+      return users
+    } catch (error) {
+      throw new DataBaseError("Erro ao carregar as entidades associadas ao usuario.")
     }
+  }
 }

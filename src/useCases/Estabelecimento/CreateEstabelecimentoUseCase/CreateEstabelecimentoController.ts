@@ -11,7 +11,7 @@ export default class CreateEstabelecimentoController {
     async handle(request: Request, response: Response, next:NextFunction) {
         const estabelecimento = request.body as Omit<IEstabelecimento, 'id'>
         try {
-            const {message, success} = await this.createEstabelecimentoUseCase.execute(estabelecimento, 2)
+            const {message, success} = await this.createEstabelecimentoUseCase.execute(estabelecimento, 4)
             if(!success)
                 return sendResponse(response, 403,[message])
             return sendResponse(response, 200, [message], )

@@ -18,8 +18,8 @@ userRoutes.post('/user', async (req, res, next:NextFunction)=>{
     await createUserController.handle(req, res, next)
 })
 
-userRoutes.put('/user', async (req, res)=>{
-    await updateUserController.handle(req,res)
+userRoutes.put('/user', async (req, res, next)=>{
+    await updateUserController.handle(req,res, next)
 })
 
 // userRoutes.delete('/user', )

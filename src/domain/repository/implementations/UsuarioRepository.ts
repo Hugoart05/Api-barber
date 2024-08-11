@@ -1,8 +1,10 @@
 import { RepositoryBase } from "./RepositoryBase";
 import { IUsuarioRepository } from "../IUsuarioRepository";
-import { Plano, Usuario } from "../../../infraestruture/database/db";
+import { Estabelecimento, Plano, Usuario } from "../../../infraestruture/database/db";
 import { ModelStatic } from "sequelize";
 import { IPlano } from "../../../types/IPlano";
+import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
+import { IUsuario } from "../../../infraestruture/database/models/IUsuario";
 
 export default class UsuarioRepository extends RepositoryBase<Usuario> implements IUsuarioRepository {
     constructor() {
@@ -30,6 +32,15 @@ export default class UsuarioRepository extends RepositoryBase<Usuario> implement
             
             console.log("falha ao buscar por email: ", error)
             throw new Error("Falha ao buscar usuário pelo email.")
+        }
+    }
+
+    async getViewModelData(usuarioid:number):Promise<IUsuario | undefined>{
+        try{
+            const user = await this.getModel().findByPk(usuarioid, {include:[{model:Plano, as: 'plan'}, {model:Estabelecimento, as:'estabelecimentos'}]}) 
+            return user?.dataValues
+        }catch(error){
+            throw new DataBaseError(error.message)
         }
     }
 }

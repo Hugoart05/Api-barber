@@ -21,11 +21,11 @@ export class CreateUserUseCase {
             if (userExist)
                 return { message: "Usuario já existe!", success: false }
 
-            const basicPlan = await this.planRepository.findByPlanName("basic2") as IPlano | null
+            const basicPlan = await this.planRepository.findByPlanName("basic") as IPlano | null
             if (!basicPlan?.id)
                 throw new NotFoundError("Erro interno")
 
-            usuario.planoid = basicPlan.id
+            usuario.planoid = 2
             await this.repository.create(usuario)
             console.log("camada use case")
             return {

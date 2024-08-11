@@ -10,5 +10,6 @@ export interface IUsuario {
     planoid: number
     createdAt?: Date,
     updatedAt?: Date
+    plan?:Plano
 }
 

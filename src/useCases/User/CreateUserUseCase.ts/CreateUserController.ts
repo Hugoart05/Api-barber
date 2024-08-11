@@ -20,7 +20,6 @@ export default class CreateUserController {
                 return sendResponse(response, 200, [message])
             return sendResponse(response,400,[message])
         } catch (errors) {
-            console.log(errors.message)
             next(errors)
         }
     }
