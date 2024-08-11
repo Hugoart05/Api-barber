@@ -1,5 +1,5 @@
 import { ApiResponse,  } from "./UserHttpResponse";
-import {Response} from 'express'
+import { Response} from 'express'
 
 export function sendResponse<T>(
     response:Response, 
@@ -15,3 +15,6 @@ export function sendResponse<T>(
     }
     return response.status(statuscode).json(responseApi)
 }
+
+
+

@@ -1,5 +1,5 @@
 import { IUsuarioRepository } from "../../../domain/repository/IUsuarioRepository";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { IPermissaoPorIntervaloTempo } from "../../../types/IPermissaoPorIntervaloTempo";
 import { sendResponse } from "../../../infraestruture/Http/ApiResponseTypes/IHttpResponse";
 import { UpdateUserUseCase } from "./UpdateUserUseCase";
@@ -10,7 +10,7 @@ export default class UpdateUserController {
         private usuarioUseCase: UpdateUserUseCase,
     ) { }
 
-    async handle(request: Request, response: Response) {
+    async handle(request: Request, response: Response, next:NextFunction) {
         try {
             const user = request.body
             if (!user.id)

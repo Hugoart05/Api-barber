@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { NextFunction, Router } from "express";
 import UsuarioRepository from "../../../domain/repository/implementations/UsuarioRepository";
 import { AuthenticationMiddlewares } from "../../../middleware/Auth.ts/AuthenticationMiddleware";
 import { getUsersController } from "../../../useCases/User/GetUsersUseCase/index.ts";
@@ -14,8 +14,8 @@ const {isAuthenticated} = new AuthenticationMiddlewares(repository)
 userRoutes.get('/user',  async (request, response)=>{
     await getUsersController.handle(request, response)
 })
-userRoutes.post('/user', async (req, res)=>{
-    await createUserController.handle(req, res)
+userRoutes.post('/user', async (req, res, next:NextFunction)=>{
+    await createUserController.handle(req, res, next)
 })
 
 userRoutes.put('/user', async (req, res)=>{

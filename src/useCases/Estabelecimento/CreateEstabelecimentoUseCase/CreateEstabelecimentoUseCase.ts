@@ -1,8 +1,11 @@
 import { IUsuarioRepository } from "../../../domain/repository/IUsuarioRepository";
 import { IEstabelecimentoRepository } from '../../../domain/repository/IEstabelecimentoRepository'
-import { Optional } from "sequelize";
+import { DatabaseError, Optional } from "sequelize";
 import { IEstabelecimento } from '../../../infraestruture/database/models/IEstabelecimento'
 import EstabelecimentoComercial from '../../../domain/entities/Estabelecimento'
+import { NotFoundError } from "../../../helpers/custom-errors/NotFoundError";
+import { CustomResult } from "../../../types/ICustomResult";
+import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
 
 export default class CreateEstabelecimentoUseCase {
     constructor(
@@ -10,22 +13,26 @@ export default class CreateEstabelecimentoUseCase {
         private estabelecimentoRepository: IEstabelecimentoRepository
     ) { }
 
-    async execute(estabelecimentoData: Optional<IEstabelecimento, 'id'>, usuarioid: number) {
+    async execute(estabelecimentoData: Optional<IEstabelecimento, 'id'>, usuarioid: number): Promise<CustomResult> {
         try {
-            const planoDoUsuario = await this.userRepository.getPlanType(usuarioid)
-            if (!planoDoUsuario)
-                throw new Error("Não a planos registrado para o usuario selecionado!")
-            const regrasDeAdicaoEstabelecimento = new EstabelecimentoComercial(planoDoUsuario)
-            const podeRegistrarEstabelecimento = regrasDeAdicaoEstabelecimento.
+            const constulaPlanoDoUsuario = await this.userRepository.getPlanType(usuarioid)
+            if (!constulaPlanoDoUsuario)
+                throw new NotFoundError("Não a planos registrado para o usuario selecionado!")
+
+            const regrasDeAdicaoEstabelecimento = new EstabelecimentoComercial(constulaPlanoDoUsuario)
+            const consultaSePodeRegistrar = regrasDeAdicaoEstabelecimento.
                 podeAdicionarEstabelecimento(await this.estabelecimentoRepository.countUserEstabelecimentos(usuarioid))
-            if (podeRegistrarEstabelecimento) {
+
+            if (consultaSePodeRegistrar) {
                 await this.estabelecimentoRepository.create(estabelecimentoData)
-                return
+                return { message: "Usuario criado com sucesso", success: true }
             }
-            throw new Error("Não é possivel adicionar estabelecimentos com o plano atual");
+            return { message: "Não é possivel registrar mais 1 estabelecimento com o plano atual", success: true }
         }catch(error){
-            throw new Error("Erro ao assosiar um estabelecimento ao usuario")
+            if(error instanceof NotFoundError)
+                throw error
+            
+            throw new DataBaseError("Erro interno ao processar a requisição")
         }
-        
     }
 }

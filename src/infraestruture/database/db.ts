@@ -12,7 +12,8 @@ export class Usuario extends Model<InferAttributes<Usuario>, InferCreationAttrib
     createdAt?: Date;
     updatedAt?: Date;
     planoid: number;
-    plan?:Plano
+    plan?:Plano;
+    estabelecimentos?:Estabelecimento
 }
 
 Usuario.init({
@@ -54,7 +55,8 @@ Usuario.init({
     planoid: {
         type: DataTypes.INTEGER,
         allowNull: false
-    }
+    },
+   
 },
     {
         sequelize,
@@ -247,8 +249,8 @@ Plano.init({
 
 
 // Definir relacionamentos
-Usuario.hasMany(Estabelecimento, { foreignKey: 'usuarioid' });
-Estabelecimento.belongsTo(Usuario, { foreignKey: 'usuarioid' });
+Usuario.hasMany(Estabelecimento, { foreignKey: 'usuarioid', as:"estabelecimentos" });
+Estabelecimento.belongsTo(Usuario, { foreignKey: 'usuarioid', as:"usuarios" });
 
 Estabelecimento.belongsTo(Categoria, { foreignKey: 'categoriaid' });
 Categoria.hasMany(Estabelecimento, { foreignKey: 'categoriaid' });

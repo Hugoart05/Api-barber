@@ -36,7 +36,7 @@ export default async function InicializarPlanos(){
                 numeroMaximoServico:20,
             },
         ]
-        const planosExistentes =await Plano.findAll()
+        const planosExistentes = await Plano.findAll()
 
         if(planosExistentes.length === 0 ){
             console.log("iniciando cadastro dos planos")

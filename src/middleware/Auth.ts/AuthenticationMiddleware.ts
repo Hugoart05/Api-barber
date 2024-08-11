@@ -14,6 +14,4 @@ export class AuthenticationMiddlewares implements IAuthenticationMidlewares {
     authorize(requiredPermission: string[]): void {
         throw new Error('Method not implemented.')
     }
-
-    
 }

@@ -1,11 +1,12 @@
-import { Optional } from "sequelize";
+import {  Optional } from "sequelize";
 import { IUsuarioRepository } from "../../../domain/repository/IUsuarioRepository.ts";
-import { Usuario } from "../../../infraestruture/database/db.ts";
 
-import UsuarioRepository from "../../../domain/repository/implementations/UsuarioRepository.ts"
 import { IPlano } from "../../../infraestruture/database/models/IPlanoModel.ts";
 import { IPlanoRepository } from "../../../domain/repository/IPlanoRepository.ts";
 import { IUsuario } from "../../../infraestruture/database/models/IUsuario.ts";
+import ConflictError from "../../../helpers/custom-errors/ConflictError.ts";
+import { CustomResult } from "../../../types/ICustomResult.ts";
+import { NotFoundError } from "../../../helpers/custom-errors/NotFoundError.ts";
 
 export class CreateUserUseCase {
     constructor(
@@ -14,16 +15,30 @@ export class CreateUserUseCase {
     ) {
     }
 
-    async execute(usuario: Optional<IUsuario, 'id'>) {
-        const userExist = await this.repository.userIsExist(usuario.email)
-        if (userExist)
-            throw new Error("O usuário com esse email ja existe na base de dados.")
+    async execute(usuario: Optional<IUsuario, 'id'>): Promise<CustomResult> {
+        try {
+            const userExist = await this.repository.userIsExist(usuario.email)
+            if (userExist)
+                return { message: "Usuario já existe!", success: false }
 
-        const basicPlan = await this.planRepository.findByPlanName("basic")
-        if (basicPlan?.id != undefined && basicPlan?.id != 0) {
-            usuario.planoid = 1
-            const test = await this.repository.create(usuario)
-            console.log(test)
+            const basicPlan = await this.planRepository.findByPlanName("basic2") as IPlano | null
+            if (!basicPlan?.id)
+                throw new NotFoundError("Erro interno")
+
+            usuario.planoid = basicPlan.id
+            await this.repository.create(usuario)
+            console.log("camada use case")
+            return {
+                message: "Usuario criado com sucesso!",
+                success: true
+            }
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw error
+            }
+            
+            throw error
+            // throw new DataBaseError("Erro interno")
         }
     }
 }

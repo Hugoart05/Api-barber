@@ -18,3 +18,12 @@ export function userValidationForm({ nome, email, password }: Optional<IUsuario,
 
     return errors
 }
+
+export function formatTimeForMessage(seconds: number): string {
+    if (seconds < 240) {
+        return `${seconds} segundos`;
+    } else {
+        const minutes = (seconds / 60).toFixed(0);
+        return `${minutes} minutos`;
+    }
+}

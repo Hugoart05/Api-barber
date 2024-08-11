@@ -7,9 +7,10 @@ export class GetUsersController {
     async handle(request: Request, response: Response) {
         try {
             const data = await this.userUseCase.execute()
-            return sendResponse(response, 200, [],data)
+            return sendResponse(response, 200, [], data)
         } catch (error) {
-            return sendResponse(response, 400, ["Erro ao buscar dados dos usuarios"],)
+            console.log(error)
+            return sendResponse(response, 400, ["Erro ao buscar dados dos usuarios 2"],)
         }
     }
 }

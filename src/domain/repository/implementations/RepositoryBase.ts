@@ -1,25 +1,31 @@
-import { Model, ModelStatic, UpdateOptions, WhereOptions } from "sequelize";
+import {  Model, ModelStatic, UpdateOptions, WhereOptions } from "sequelize";
 import { IRepositoryBase } from '../IRepositoryBase'
+import { DataBaseError } from "../../../helpers/custom-errors/DataBaseError";
 
 export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
     constructor(private model: ModelStatic<T>) { }
     async getById(id: number): Promise<T | null> {
         try {
-            return await this.model.findByPk(id) as T
+            const result= await this.model.findByPk(id) 
+            if(!result)
+                throw new DataBaseError("Registro não encontrado")
+
+            return result
         } catch (error) {
-            console.log("Ocorreu um erro ao buscar por id:", error)
-            throw new Error("Falha ao tentar buscar usuario pelo id")
+            throw new DataBaseError("Falha ao tentar buscar registro pelo id")
         }
     }
 
     async update(id: number, data: Partial<T>): Promise<void> {
         try {
-            await this.model.update(data, {
+            const [affectedCount] = await this.model.update(data, {
                 where: { id }
             } as UpdateOptions)
+
+            if(affectedCount)
+                throw new DataBaseError("Falha ao atualizar o registro")
         } catch (error) {
-            console.log("Ocorreu um erro ao atualizar: ", error)
-            throw new Error("Falha ao tentar atualizar o usuario id")
+            throw new DataBaseError("Nenhum registro foi atualizado, verifique se o id esta correto")
         }
     }
 
@@ -27,10 +33,9 @@ export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
         try {
             const affectedCount = await this.model.destroy({ where: { id } as WhereOptions })
             if(affectedCount === 0)
-                throw new Error(`Nenhum registro foi deletado, verifique se o id esta correto`)
+                throw new DataBaseError(`Nenhum registro foi deletado, verifique se o id esta correto`)
         }catch(error){
-            console.log("Ocorreu um erro ao deletar: ", error)
-            throw new Error(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
+            throw new DataBaseError(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
         }
     }
     async findAll(): Promise<T[]> {
@@ -41,8 +46,7 @@ export class RepositoryBase<T extends Model> implements IRepositoryBase<T> {
         try{
             return await this.model.create(data)
         }catch(error){
-            console.log("Ocorreu um erro ao criar: ", error)
-            throw new Error(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
+            throw new DataBaseError(`Problemas ao acessar a base de dados, tente novamente mais tarde`)
         }
     }
 
