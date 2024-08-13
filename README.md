@@ -79,3 +79,104 @@ A resposta padrão para a API é formatada da seguinte maneira:
     DB_HOST=localhost
     DB_USER=your_db_user
     DB_PASS=your_
+
+
+    ## Rotas da API
+
+### 1. Obter Todos os Usuários
+
+- **Método**: GET
+- **Endpoint**: `/api/users`
+- **Descrição**: Retorna uma lista de todos os usuários.
+- **Parâmetros de Consulta**: Nenhum.
+- **Resposta:**
+
+    ```json
+    {
+      "statuscode": 200,
+      "message": "Success",
+      "data": [
+        {
+          "id": 1,
+          "name": "John Doe",
+          "email": "john.doe@example.com"
+        }
+      ]
+    }
+    ```
+
+### 2. Criar um Novo Usuário
+
+- **Método**: POST
+- **Endpoint**: `/api/users`
+- **Descrição**: Cria um novo usuário.
+- **Corpo da Requisição:**
+
+    ```json
+    {
+      "name": "Jane Doe",
+      "email": "jane.doe@example.com",
+      "password": "securepassword"
+    }
+    ```
+
+- **Resposta:**
+
+    ```json
+    {
+      "statuscode": 201,
+      "message": "Usuario criado com sucesso!",
+      "data": {
+        "id": 2,
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com"
+      }
+    }
+    ```
+
+### 3. Atualizar um Usuário
+
+- **Método**: PUT
+- **Endpoint**: `/api/users/:id`
+- **Descrição**: Atualiza as informações de um usuário específico.
+- **Parâmetros de URL**: 
+  - `id` (Número): ID do usuário a ser atualizado.
+- **Corpo da Requisição:**
+
+    ```json
+    {
+      "name": "Jane Doe Updated",
+      "email": "jane.doe.updated@example.com"
+    }
+    ```
+
+- **Resposta:**
+
+    ```json
+    {
+      "statuscode": 200,
+      "message": "User updated successfully",
+      "data": {
+        "id": 2,
+        "name": "Jane Doe Updated",
+        "email": "jane.doe.updated@example.com"
+      }
+    }
+    ```
+
+### 4. Excluir um Usuário
+
+- **Método**: DELETE
+- **Endpoint**: `/api/users/:id`
+- **Descrição**: Exclui um usuário específico.
+- **Parâmetros de URL**: 
+  - `id` (Número): ID do usuário a ser excluído.
+- **Resposta:**
+
+    ```json
+    {
+      "statuscode": 204,
+      "message": "User deleted successfully",
+      "data": null
+    }
+    ```
